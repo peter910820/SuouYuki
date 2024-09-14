@@ -5,6 +5,7 @@ new discord music bot with python &amp; yt-dlp
 
 真紅貓貓的yt-dlp版本實踐，算是暫時拿來擋著用的音樂機器人
 
+```
 ➖/join :(已經可以使用play功能直接呼叫並播歌，此功能已被整合)讓機器人到發話者的語音頻道
 ✅/leave : 讓機器人退出語音頻道
 ✅/play YouTube影片網址 : 增加歌曲到播放清單並播放，將playlist(播放清單的功能整合進來)
@@ -15,3 +16,4 @@ new discord music bot with python &amp; yt-dlp
 ✅/insert: 插入一首歌到下一首
 ✅/pause : 暫停音樂
 ✅/resume : 恢復音樂
+```
