@@ -37,6 +37,7 @@ class YoutubePlayerV3r(commands.Cog):
 
     @app_commands.command(name= "play", description= "🌟播放音樂🌟")
     async def play(self, interaction: discord.Interaction, youtube_url: str) -> None:
+        await interaction.response.defer()
         youtube_url = self.url_format(youtube_url)
         if await self.handle_connect(interaction):
             if youtube_url.startswith("https://www.youtube.com/"):
@@ -44,10 +45,9 @@ class YoutubePlayerV3r(commands.Cog):
                     await self.obtain_details(youtube_url)
                 except Exception as e:
                     print(f"❌error={e}❌")
-                    await interaction.response.send_message("❌意外狀況發生,請檢察log❌")
+                    await interaction.followup.send(f"❌意外狀況發生,請檢察log❌")
                     return
                 if not self.bot.voice_clients[0].is_playing():
-                    await interaction.response.defer()
                     await interaction.followup.send(f"歌單已加入: 歌單URL為{youtube_url} 呦🌟 即將開始播放歌曲~")
                     title = self.play_queue[0]["title"]
                     url = self.play_queue[0]["url"]
@@ -70,11 +70,11 @@ class YoutubePlayerV3r(commands.Cog):
                             ydl.download([url])
                     self.bot.voice_clients[0].play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable=self.ffmpeg_path, source=f"{self.song_path}{title}.mp3"), volume=self.volume), after = lambda _ : self.after_song_interface(interaction))
                 else:
-                    await interaction.response.send_message(f"歌曲已加入排序: 歌單URL為{youtube_url} 呦🌟")
+                    await interaction.followup.send(f"歌曲已加入排序: 歌單URL為{youtube_url} 呦🌟")
             else:
-                await interaction.response.send_message("找不到歌曲呦!❌")
+                await interaction.followup.send("找不到歌曲呦!❌")
         else:
-            await interaction.response.send_message("使用者還沒進入語音頻道呦❌")
+            await interaction.followup.send("使用者還沒進入語音頻道呦❌")
 
     async def after_song(self, interaction: discord.Interaction):
         print(interaction)
@@ -105,8 +105,8 @@ class YoutubePlayerV3r(commands.Cog):
             self.clean(self)
             game = discord.Game("恋×シンアイ彼女")
             await self.bot.change_presence(activity=game, status=discord.Status.online) # status
-            await interaction.response.send_message("🌟已播放完歌曲🌟")
             print("🌟已播放完歌曲🌟")
+            await interaction.followup.send("🌟已播放完歌曲🌟")
 
     def after_song_interface(self, interaction: discord.Interaction):
         self.bot.loop.create_task(self.after_song(interaction))
@@ -143,8 +143,9 @@ class YoutubePlayerV3r(commands.Cog):
 
     @app_commands.command(name= "list", description= "🌟查詢歌曲清單🌟")       
     async def list(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if len(self.play_queue) == 0:
-            await interaction.response.send_message("播放清單目前為空呦")
+            await interaction.followup.send("播放清單目前為空呦")
         else:
             playlist_check = f"```\n播放清單剩餘歌曲: {len(self.play_queue)}首\n"
             for index, t in enumerate(self.play_queue, start=1):
@@ -154,27 +155,29 @@ class YoutubePlayerV3r(commands.Cog):
                     break
             playlist_check += "```"
             print(playlist_check)
-            await interaction.response.send_message(playlist_check)
+            await interaction.followup.send(playlist_check)
 
     @app_commands.command(name= "now", description= "🌟現在播放歌曲🌟")
     async def now(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
         if len(self.play_queue) == 0:
-            await interaction.response.send_message("播放清單目前為空呦🌟")
+            await interaction.followup.send("播放清單目前為空呦🌟")
         else:
             tmp_str = f"現在歌曲: **{self.play_queue[0]['title']}**"
-            await interaction.response.send_message(tmp_str)
+            await interaction.followup.send(tmp_str)
 
     @app_commands.command(name= "insert", description= "🌟插入歌曲到下一首🌟")
     async def insert(self, interaction: discord.Interaction, youtube_url: str) -> None:
+        await interaction.response.defer()
         youtube_url = self.url_format(youtube_url)
         if youtube_url.startswith("https://www.youtube.com/playlist?list="):
-            await interaction.response.send_message(f"此功能不支援清單插入呦❌")
+            await interaction.followup.send(f"此功能不支援清單插入呦❌")
             return
         elif not youtube_url.startswith("https://www.youtube.com/"):
-            await interaction.response.send_message("找不到歌曲呦!❌")
+            await interaction.response.followup.send("找不到歌曲呦!❌")
         else:
             if self.bot.voice_clients != []:
-                await interaction.response.send_message("插入歌曲到下一首🌟")
+                await interaction.response.followup.send("插入歌曲到下一首🌟")
                 try:
                     ydl_opts = {
                     "cookiefile": self.cookie_path,
@@ -191,31 +194,33 @@ class YoutubePlayerV3r(commands.Cog):
                 except Exception as e:
                     print(f"❌error={e}❌")
             else:
-                await interaction.response.send_message("機器人未加入語音頻道呦❌")
+                await interaction.followup.send("機器人未加入語音頻道呦❌")
 
     @app_commands.command(name= "skip", description= "🌟跳過歌曲🌟")
     async def skip(self, interaction: discord.Interaction, count: int= 1) -> None:
+        await interaction.response.defer()
         if self.bot.voice_clients[0] != []:
-            await interaction.response.send_message("歌曲已跳過🌟")
+            await interaction.followup.send("歌曲已跳過🌟")
             self.bot.voice_clients[0].stop()
             if count > 1:
                 count -= 1
                 for _ in range(0, count):
                     self.play_queue.pop(0)
         else:
-            await interaction.response.send_message("我還沒加入語音頻道呦🌟")
+            await interaction.followup.send("我還沒加入語音頻道呦🌟")
 
     @app_commands.command(name= "look", description= "🌟查看指定位置歌曲🌟")  
     async def look(self, interaction: discord.Interaction, number: int) -> None:
+        await interaction.response.defer()
         if len(self.play_queue) == 0:
-            await interaction.response.send_message("❌播放清單目前為空呦❌")
+            await interaction.followup.send("❌播放清單目前為空呦❌")
             return
         try:
             msg = f"第{number}的歌曲為: **{self.play_queue[number-1]['title']}**" if number > 0 else "索引值不得為0或小於0"
-            await interaction.response.send_message(msg)
+            await interaction.followup.send(msg)
         except Exception as e:
             print(f"❌error={e}❌")
-            await interaction.response.send_message("❌意外狀況發生,請檢察log❌")
+            await interaction.followup.send("❌意外狀況發生,請檢察log❌")
 
     @app_commands.command(name= "pause", description= "🌟暫停歌曲🌟")  
     async def pause(self, interaction) -> None:
