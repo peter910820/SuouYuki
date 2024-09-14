@@ -174,10 +174,10 @@ class YoutubePlayerV3r(commands.Cog):
             await interaction.followup.send(f"此功能不支援清單插入呦❌")
             return
         elif not youtube_url.startswith("https://www.youtube.com/"):
-            await interaction.response.followup.send("找不到歌曲呦!❌")
+            await interaction.followup.send("找不到歌曲呦!❌")
         else:
             if self.bot.voice_clients != []:
-                await interaction.response.followup.send("插入歌曲到下一首🌟")
+                await interaction.followup.send("插入歌曲到下一首🌟")
                 try:
                     ydl_opts = {
                     "cookiefile": self.cookie_path,
