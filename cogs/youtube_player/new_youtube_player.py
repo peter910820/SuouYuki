@@ -241,6 +241,8 @@ class YoutubePlayerV3r(commands.Cog):
             await interaction.response.send_message("沒有歌曲正在暫停呦🌟")
 
     def url_format(self, youtube_url: str) -> str:
+        if "&list=" in youtube_url:
+            return(youtube_url[0:youtube_url.find("&list=")])
         if youtube_url.startswith("https://www.youtube.com/"):
             return youtube_url
         elif youtube_url.startswith("https://music.youtube.com/"):
