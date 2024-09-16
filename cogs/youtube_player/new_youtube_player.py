@@ -29,6 +29,7 @@ class YoutubePlayerV3r(commands.Cog):
     async def leave(self, interaction: discord.Interaction) -> None:
         if self.bot.voice_clients != []:
             await self.bot.voice_clients[0].disconnect()
+            self.play_queue = []
             await self.bot.change_presence(activity = discord.Game("ブルーアーカイブ -Blue Archive-"), status=discord.Status.online)
             await interaction.response.send_message("已離開頻道❌")
         else:
