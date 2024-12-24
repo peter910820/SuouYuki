@@ -7,7 +7,7 @@ class General(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name= "ping", description="testing bot delay")
-    async def id(self, interaction: discord.Interaction):
+    async def ping(self, interaction: discord.Interaction):
         await interaction.response.send_message(f"delay time: {str(round(self.latency*1000, 2))}ms.")  
 
     @app_commands.command(name= "id", description="check user id.")
